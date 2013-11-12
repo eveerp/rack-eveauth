@@ -1,0 +1,28 @@
+<html>
+
+    <h1> authenticate as an capsuleer </h1>
+    <form method="post">
+      <caption>name of your capsuleer:</caption><input type="text" name="capsuleer_name" value="<%= session[:capsuleer].name %>"/></br>
+      <caption>password:</caption><input type="password" name="password" />
+      <input type="hidden" name="auth_or_register" value="auth"></br>
+      <input type="submit" name="login" value="log in!"/>
+    </form>
+
+
+    <h1> become immortal (register your capsuleer) </h1>
+    <% if request.igb %>
+        <% if not request.igb.trusted? %>
+            please trust and reload this site!
+            <button type="button" onclick="CCPEVE.requestTrust('<%= request.url.gsub("/auth","/*") %>');">Request Trust</button>
+        <% else %>
+            You are: <%= session[:capsuleer].name %>,
+            <form method="post">
+                <caption>please choose your password:</caption><input type="password" name="password"> </input>
+                <input type="hidden" name="auth_or_register" value="register">
+            </form>
+        <% end %>
+    <% else %>
+        please use the IGB to create an account here!
+    <% end %>
+
+</html>
