@@ -1,39 +1,17 @@
 rack-eveauth
 =================
+This is a prototype of a Rack middleware to create and authenticate users and connect sessions with their EvE Online capsuleers using the IGB.
 
-A Rack middleware to counter DoS Attacks by blocking bad requests before they reach your app using Redis as backend
 
-This middleware is designed for small deployments, which most likely are not utilizing load balancing from other software or hardware. Using Redis as the backend is particularly useful in cloud hosting environments like Heroku and others where the only shared information between the nodes is the network attached database.
-
-Deflect currently supports the following functionality:
-
- * Saturation prevention (small DoS attacks, or request abuse)
- * Blocking from the apps response (via special headers)
- * Whitelisting of known good remote addresses
- * Applies only for given REQUEST_METHODS (defaults to all types)
- * Logging
- * Falling back to block / allow all when redis fails
-
-Options:
+settings:
 ===
 
-*   :log                When false logging will be bypassed, otherwise pass an object responding to #puts
-*   :log_format         Alter the logging format
-*   :log_date_format    Alter the logging date format
-*   :request_threshold  Number of requests allowed within the set :interval. Defaults to 100
-*   :interval           Duration in seconds until the request counter is reset. Defaults to 5
-*   :block_duration     Duration in seconds that a remote address will be blocked. Defaults to 900 (15 minutes)
-*   :skip_for           Array of remote addresses which bypass Deflect. NOTE: this does not block others
-*   :default_block      When true, blocks requests when redis failed for whatever reason
-*   :request_methods    Regexp object. This middleware is only applied if the regexp matches the request method
-*   :redis_host => "127.0.0.1"
-*   :redis_port => 6379
-*   :redis_db => 0
-*   :redis_timeout => 5 
-*   :redis_password => nil
+*   :mongo_uri => nil (required)
 
 Examples:
 ===
 ```ruby
-use Rack::Eveauth, :log => $stdout
+require 'rack-eveauth'
+Rack::Eveauth.set :mongo_uri, ENV['MONGO_URI']+"_#{ENV['RACK_ENV'] || "development"}"
+use Rack::Eveauth
 ```
