@@ -16,9 +16,9 @@ module EveauthHelper
 
   def auth_with_password(name,pass)
     c = ::Eveauth::Capsuleer.where({name: name}).first
-    if c.is_this_your_password?(pass)
+    if c and c.is_this_your_password?(pass)
       auth!(c)
-      redirect "/"
+      halt 200
     else
       halt 403
     end

@@ -1,5 +1,6 @@
 require 'sinatra/base'
 require_relative '../backend/backend'
+require 'json'
 
 # TODO: write tests; run tests; do the same with specs or whatever
 
@@ -10,9 +11,6 @@ module Rack
   class Eveauth < Sinatra::Base
     enable :sessions
     helpers EveauthHelper
-
-    set :views, ::File.join(::File.dirname(__FILE__), '..', '..', 'views')
-    set :public_folder, ::File.join(::File.dirname(__FILE__), '..', '..', 'public')
 
     before do
 
@@ -57,20 +55,9 @@ module Rack
       end
     end
 
-    get('/auth') { erb :authscreen }
-
-    post('/auth') do
-      if params["auth_or_register"] == "register"
-        if register!(params["password"])
-          erb :registered
-        else
-          redirect "/auth"
-        end
-      else
-        auth_with_password(params["capsuleer_name"],params["password"])
-      end
-    end
-
   end
+
+  require_relative '../controller/auth_controller'
+  require_relative '../controller/apikey_controller'
 
 end

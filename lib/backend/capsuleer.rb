@@ -33,8 +33,8 @@ module Eveauth
     end
 
     def secret_remember_me_token!
-      # abitrarily choosing 32 as the number of pseudo-random floats to be "secure enough"
-      s = Digest::SHA1.hexdigest(Array.new(32).map { rand().to_s }.join)
+      # abitrarily choosing 32 as the length to be "secure enough"
+      s = SecureRandom.hex(32)
       self.srmt = s
       self.save
       s
