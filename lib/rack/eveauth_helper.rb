@@ -30,12 +30,12 @@ module EveauthHelper
   end
 
   def register!(pass)
-    if not ::Eveauth::Capsuleer.where({name: session[:capsuleer].name}).exists?
-      session[:capsuleer].password = pass
-      session[:capsuleer].authenticated = true
-      auth!(session[:capsuleer])
+    if not ::Eveauth::Capsuleer.where({name: env[:capsuleer].name}).exists?
+      env[:capsuleer].password = pass
+      env[:capsuleer].authenticated = true
+      auth!(env[:capsuleer])
     end
-    session[:capsuleer].save
+    env[:capsuleer].save
   end
 
 end

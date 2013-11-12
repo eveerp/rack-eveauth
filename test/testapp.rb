@@ -7,11 +7,11 @@ class TestApp < Sinatra::Base
   use Rack::Eveauth
 
   before do
-    unless session[:capsuleer]
+    unless env[:capsuleer]
       halt "Access denied, please <a href='/login'>login</a>."
     end
   end
 
-  get('/') { "Hello #{session[:capsuleer].name}" }
+  get('/') { "Hello #{env[:capsuleer].name}" }
 
 end

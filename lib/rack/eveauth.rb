@@ -12,6 +12,7 @@ module Rack
     helpers EveauthHelper
 
     set :views, ::File.join(::File.dirname(__FILE__), '..', '..', 'views')
+    set :public_folder, ::File.join(::File.dirname(__FILE__), '..', '..', 'public')
 
     before do
 
@@ -21,18 +22,17 @@ module Rack
         settings.mongo_uri = nil
       end
 
-      # first: check for IGB and if present, encapsulate the igb object in the request
-      def request.igb
-        @igb = self.user_agent =~ /EVE-IGB/ ? IGBRequest.new(self.env) : nil unless @igb
-        @igb
-      end
+      # first: check for IGB and if present, encapsulate the igb object in the request environment
+      # also make sure that there is no capsuleer set for whatever hackish reason
+      env[:igb] = request.user_agent =~ /EVE-IGB/ ? IGBRequest.new(self.env) : nil
+      env[:capsuleer] = nil
 
       # secondly, check if we have a valid session running
       if session[:srmt]
         capsuleer = ::Eveauth::Capsuleer.where({secret_remember_me_token: session[:srmt]}).first
         if capsuleer
           capsuleer.authenticated=true
-          session[:capsuleer] = capsuleer
+          env[:capsuleer] = capsuleer
           return
         else
           session[:srmt] = nil
@@ -40,22 +40,21 @@ module Rack
       end
 
       # third: build the capsuleer object for this session
-      if request.igb and request.igb.trusted?
-        session[:capsuleer] = ::Eveauth::Capsuleer.new(
-            {name: request.igb.CHARNAME,
-             capsuleer_id: request.igb.CHARID,
-             corporation: request.igb.CORPNAME
+      if env[:igb] and env[:igb].trusted?
+        env[:capsuleer] = ::Eveauth::Capsuleer.new(
+            {name: env[:igb].CHARNAME,
+             capsuleer_id: env[:igb].CHARID,
+             corporation: env[:igb].CORPNAME
             }
         )
       else
-        session[:capsuleer] = ::Eveauth::Capsuleer.new(
+        env[:capsuleer] = ::Eveauth::Capsuleer.new(
             {name: "Anonymous",
              capsuleer_id: 42,
              corporation: "Anon Inc."
             }
         )
       end
-
     end
 
     get('/auth') { erb :authscreen }
